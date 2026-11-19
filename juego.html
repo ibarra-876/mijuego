@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>La aventura mágica de Iquitos</title>
+<style>
+:root{--ink:#17302b;--cream:#fff0cf;--green:#2f8745;--yellow:#ffca45}
+*{box-sizing:border-box}
+html{min-height:100%;background:#b8e7d0}
+body{margin:0;padding:clamp(6px,2vw,14px);background:linear-gradient(#e6f7e9,#b8e7d0);font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:var(--ink);display:flex;justify-content:center;min-height:100vh;overscroll-behavior:none}
+main{width:min(100%,1100px);margin:auto}
+h1{margin:4px 0 2px;text-align:center;font-size:clamp(1.25rem,3.2vw,2rem);color:#1a5437;text-shadow:1px 2px #fff}
+.subtitle{text-align:center;margin:0 0 10px;font-size:clamp(.82rem,2vw,1rem)}
+.game-shell{position:relative;border:6px solid #183d32;border-radius:22px;overflow:hidden;background:#74cbe9;box-shadow:0 8px 0 #8bb69d}
+canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;image-rendering:pixelated;touch-action:none;user-select:none;-webkit-user-select:none}
+.hud{position:absolute;inset:10px 10px auto;display:flex;gap:7px;align-items:center;flex-wrap:wrap;pointer-events:none}
+.pill{background:var(--cream);border:3px solid #263d34;border-radius:16px;padding:6px 10px;font-weight:900;font-size:clamp(.7rem,1.8vw,.98rem);box-shadow:0 2px 0 #a77d4b;white-space:nowrap}
+.pill.power{margin-left:auto}
+.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;background:#103d35a8}
+.overlay.hidden{display:none}
+.panel{width:min(92%,520px);padding:22px;border:4px solid #234d38;border-radius:22px;background:#fff4d8;text-align:center;box-shadow:0 7px 0 #8a6840}
+.panel h2{margin:0 0 8px;color:#1e603d;font-size:clamp(1.25rem,4vw,2rem)}
+.panel p{margin:8px 0;line-height:1.45}
+.panel button,.controls button{border:3px solid #234d38;border-radius:14px;padding:10px 16px;font-weight:900;font-size:1rem;cursor:pointer;touch-action:manipulation}
+.panel button{background:#ffca45;color:#2b342b;margin-top:8px}
+.controls{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:12px 0;user-select:none;-webkit-user-select:none}
+.controls button{min-width:116px;min-height:48px;box-shadow:0 4px 0 #315044;touch-action:none;-webkit-tap-highlight-color:transparent}
+.controls button:active{transform:translateY(3px);box-shadow:0 1px 0 #315044}
+#leftBtn,#rightBtn{background:#d8e8c5}#jumpBtn{background:#ffca45}#crouchBtn{background:#b9e5ff}#restartBtn{background:#bdf0d1}
+@media(max-width:700px){body{padding:5px;align-items:flex-start}main{width:100%}h1{font-size:1.35rem}.subtitle{font-size:.82rem}.game-shell{border-width:3px;border-radius:12px}.controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 2px}.controls button{width:100%;min-width:0;min-height:54px;font-size:1rem;padding:10px 6px}.controls #restartBtn{grid-column:1/-1}.help{font-size:.78rem;padding:0 5px}.panel{padding:14px;width:96%}.panel p{font-size:.88rem}.hud{inset:4px 4px auto;gap:3px}.pill{font-size:clamp(.58rem,2.2vw,.78rem);padding:3px 5px;border-width:2px}}
+@media(orientation:landscape) and (max-height:520px){body{padding:4px}main{width:min(100%,1000px)}h1,.subtitle,.help{display:none}.game-shell{max-height:70vh}.controls{margin:6px 0}.controls button{min-height:40px;padding:6px}.panel{padding:10px}.panel p{margin:4px 0}}
+.help{text-align:center;font-size:.86rem;margin:6px 0 0}
+@media(max-width:520px){body{padding:6px}.game-shell{border-width:4px;border-radius:15px}.hud{inset:5px 5px auto;gap:4px}.pill{padding:4px 6px;border-width:2px}.controls{gap:6px}.controls button{padding:9px 10px;font-size:.88rem}}
+
+/* Pantalla completa y controles táctiles */
+html,body{width:100%;min-height:100%;margin:0}
+body{padding:clamp(4px,1vw,12px);overscroll-behavior:none;touch-action:pan-x pan-y}
+canvas{touch-action:none}
+.controls button{touch-action:none;-webkit-user-select:none;user-select:none}
+@media(max-width:700px){
+  body{padding:4px;min-height:100dvh}
+  main{width:100%;max-width:none}
+  .game-shell{width:100%;border-radius:10px}
+  canvas{width:100%;height:auto;max-height:58dvh;object-fit:contain}
+  .controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:8px 0}
+  .controls button{min-width:0;min-height:58px;padding:8px 3px;font-size:clamp(.78rem,3vw,1rem);border-radius:12px}
+  .controls #restartBtn{grid-column:1/-1;min-height:44px}
+  .help{font-size:.75rem}
+}
+@media(orientation:landscape) and (max-height:600px){
+  body{padding:3px}
+  main{display:grid;grid-template-columns:minmax(0,1fr) 190px;gap:6px;align-items:start}
+  h1,.subtitle,.help{display:none}
+  .game-shell{grid-column:1;grid-row:1}
+  canvas{height:calc(100dvh - 12px);width:100%;max-height:calc(100dvh - 12px);object-fit:contain}
+  .controls{grid-column:2;grid-row:1;display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0}
+  .controls button{min-width:0;min-height:52px;padding:5px 2px;font-size:.82rem}
+  .controls #restartBtn{grid-column:1/-1}
+}
+.back-home{position:fixed;z-index:20;top:10px;left:10px;padding:9px 13px;border:2px solid #234d38;border-radius:999px;background:#fff4d8;color:#17302b;text-decoration:none;font-weight:900;box-shadow:0 3px 0 #8a6840}
+.back-home:focus-visible{outline:3px solid #ffca45;outline-offset:3px}
+</style>
+</head>
+<body>
+<a class="back-home" href="index.html">Volver a la página</a>
+<main>
+<h1>🌿 La aventura mágica de Iquitos 🌿</h1>
+<p class="subtitle">¡Supera 3 niveles por Iquitos, recoge plantas mágicas y llega a la meta!</p>
+<div class="game-shell">
+<canvas id="game" width="960" height="540" tabindex="0" aria-label="Juego de aventuras de Iquitos"></canvas>
+<div class="hud">
+ <div class="pill" id="levelHud">🗺️ Nivel: 1/3</div>
+ <div class="pill" id="timerHud">⏱️ 45s</div>
+ <div class="pill" id="livesHud">❤️ Vidas: 3</div>
+ <div class="pill" id="plantsHud">🌱 Plantas: 0/10</div>
+ <div class="pill" id="goalHud">🏁 Meta: 0%</div>
+ <div class="pill power" id="powerHud">✨ Poder: ninguno</div>
+</div>
+<div class="overlay" id="overlay">
+ <div class="panel">
+  <h2 id="overlayTitle">¡Aventura en Iquitos!</h2>
+  <p id="overlayText">Esquiva piedras, troncos y gallinazos. Recoge 10 plantas mágicas para ganar.</p>
+  <p><b>Laptop:</b> A/D o ←/→ para moverte, Espacio/↑ para saltar y ↓/S para agacharte.<br><b>Celular:</b> usa los botones de movimiento, salto y agacharse.</p>
+  <button id="startBtn">¡JUGAR!</button>
+ </div>
+</div>
+</div>
+<div class="controls" aria-label="Controles del juego">
+ <button id="leftBtn" aria-label="Mover a la izquierda">⬅ MOVER</button>
+ <button id="rightBtn" aria-label="Mover a la derecha">MOVER ➡</button>
+ <button id="jumpBtn">⬆ SALTAR</button>
+ <button id="crouchBtn">⬇ AGACHARSE</button>
+ <button id="restartBtn">↻ REINICIAR</button>
+</div>
+<p class="help"><b>Laptop:</b> A/D o ←/→ para moverte · Espacio/↑ para saltar · S/↓ para agacharte.<br><b>Celular:</b> usa los botones táctiles. Cada nivel dura 45 segundos. El personaje corre sobre el camino y el fondo no muestra tierra debajo del suelo.</p>
+<p class="help">Uña de gato: +1 vida · Guaraná: velocidad x2 · Ayahuasca: invencibilidad.</p>
+</main>
+<script>
+(() => {
+'use strict';
+const canvas=document.getElementById('game');
+const ctx=canvas.getContext('2d',{alpha:false});
+ctx.imageSmoothingEnabled=false;
+const W=canvas.width,H=canvas.height,GROUND=470;
+const $=id=>document.getElementById(id);
+function image(src){const im=new Image();im.src=src;return im}
+const hero=image('assets/jugador-sprites.png');
+const villainFrames=['assets/gallinazo-1.png','assets/gallinazo-2.png','assets/gallinazo-3.png','assets/gallinazo-4.png'].map(image);
+const scene=image('assets/nivel-1.jpg');
+const sceneLevel2=image('assets/nivel-2.jpg');
+const sceneLevel3=image('assets/nivel-3.jpg');
+
+let state='ready',lastTime=0,elapsed=0,world=0,speed=280,boost=0,shield=0,invuln=0;
+let lives=3,plants=0,distance=0,level=1,levelTime=0,obstacleTimer=1.2,plantTimer=1.8,birdTimer=3.5;
+let obstacles=[],pickups=[],birds=[],particles=[];
+const finishDistance=10500;
+const player={x:132,y:GROUND-104,w:88,h:104,vy:0,onGround:true,crouching:false,frame:4,anim:0,hitFlash:0};
+const moveInput={left:false,right:false};
+const MOVE_SPEED=300;
+const rand=(a,b)=>a+Math.random()*(b-a);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function setHud(){
+ $('levelHud').textContent='🗺️ Nivel: '+level+'/3';
+ $('timerHud').textContent='⏱️ '+Math.max(0,Math.ceil(45-levelTime))+'s';
+ $('livesHud').textContent='❤️ Vidas: '+lives;
+ $('plantsHud').textContent='🌱 Plantas: '+plants+'/10';
+ $('goalHud').textContent='🏁 Meta: '+Math.min(100,Math.floor(distance/finishDistance*100))+'%';
+ $('powerHud').textContent='✨ Poder: '+(shield>0?'Ayahuasca '+Math.ceil(shield)+'s':boost>0?'Guaraná '+Math.ceil(boost)+'s':'ninguno');
+}
+function reset(){
+ moveInput.left=false;moveInput.right=false;
+ state='ready';lastTime=0;elapsed=0;world=0;speed=280;boost=0;shield=0;invuln=0;
+ lives=3;plants=0;distance=0;level=1;levelTime=0;obstacleTimer=1.2;plantTimer=1.8;birdTimer=3.5;
+ obstacles=[];pickups=[];birds=[];particles=[];
+ Object.assign(player,{x:132,y:GROUND-104,w:88,h:104,vy:0,onGround:true,crouching:false,frame:4,anim:0,hitFlash:0});
+ $('overlayTitle').textContent='¡Aventura en Iquitos!';
+ $('overlayText').textContent='Supera 3 niveles de 45 segundos cada uno. Recoge plantas mágicas, esquiva piedras, troncos y gallinazos. Conservas tus vidas entre niveles.';
+ $('startBtn').textContent='¡JUGAR!';
+ $('overlay').classList.remove('hidden');
+ setHud();draw();
+}
+function start(){
+ if(state==='playing')return;
+ if(state==='won'||state==='lost')reset();
+ state='playing';$('overlay').classList.add('hidden');lastTime=0;
+ requestAnimationFrame(loop);
+}
+function nextLevel(){
+ if(level>=3){finish(true);return}
+ level++;
+ state='levelup';
+ distance=0;plants=0;elapsed=0;levelTime=0;boost=0;shield=0;invuln=0;
+ obstacles=[];pickups=[];birds=[];particles=[];
+ obstacleTimer=.9;plantTimer=1.2;birdTimer=2.5;
+ player.x=132;player.y=GROUND-player.h;player.vy=0;player.onGround=true;player.crouching=false;
+ moveInput.left=false;moveInput.right=false;
+ const names=['','Ribera de Iquitos','La ruta del Malecón','Parque Turístico Quistococha'];
+ $('overlayTitle').textContent='¡NIVEL '+level+' DESBLOQUEADO! 🌟';
+ $('overlayText').textContent=names[level]+'. La aventura se vuelve más desafiante. Recoge otras 10 plantas mágicas y llega a la meta.';
+ $('startBtn').textContent='CONTINUAR NIVEL '+level;
+ $('overlay').classList.remove('hidden');
+ setHud();draw();
+}
+function finish(won){
+ moveInput.left=false;moveInput.right=false;
+ state=won?'won':'lost';
+ $('overlayTitle').textContent=won?'¡CAMPEÓN DE LA GRAN AVENTURA! 🏆':'¡INTÉNTALO OTRA VEZ! 💚';
+ $('overlayText').textContent=won?'¡Completaste los 3 niveles de 45 segundos! ¡La aventura de Iquitos es tuya!':'Te quedaste sin vidas. Vuelve a intentarlo y supera los 3 niveles.';
+ $('startBtn').textContent=won?'JUGAR DE NUEVO':'REINTENTAR';
+ $('overlay').classList.remove('hidden');
+ setHud();
+}
+function jump(){
+ if(state==='ready'){start();return}
+ if(state!=='playing')return;
+ player.crouching=false;
+ if(player.onGround){player.vy=-650;player.onGround=false}
+}
+function setCrouch(v){
+ if(state==='ready'&&v)start();
+ if(state==='playing')player.crouching=v&&player.onGround;
+}
+function spawnObstacle(){
+ const type=Math.random()<.58?'rock':'log';
+ const h=type==='rock'?rand(28,46):rand(28,38);
+ const w=type==='rock'?rand(34,50):rand(52,72);
+ obstacles.push({type,x:W+30,y:GROUND-h,w,h,passed:false});
+}
+function spawnPlant(){
+ const types=['cat','guarana','ayahuasca'];
+ const type=types[Math.floor(Math.random()*types.length)];
+ pickups.push({type,x:W+30,y:GROUND-rand(85,165),r:17,phase:rand(0,Math.PI*2)});
+}
+function spawnBird(){
+ birds.push({x:W+60,y:GROUND-rand(135,210),w:92,h:76,phase:rand(0,7),hit:false});
+}
+function overlap(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
+function loseLife(x,y){
+ if(invuln>0)return;
+ lives--;invuln=1.25;player.hitFlash=.45;
+ burst(x,y,'#ff775c',10);
+ if(lives<=0){setHud();finish(false)}
+}
+function burst(x,y,color,n=8){
+ for(let i=0;i<n;i++)particles.push({x,y,vx:rand(-100,100),vy:rand(-170,-30),life:rand(.25,.65),max:.65,color});
+}
+function update(dt){
+ if(state!=='playing')return;
+ levelTime += dt;
+ if(levelTime >= 45){
+  if(level < 3){nextLevel();return;}
+  finish(true);return;
+ }
+
+ elapsed+=dt;
+ if(boost>0)boost=Math.max(0,boost-dt);
+ if(shield>0)shield=Math.max(0,shield-dt);
+ if(invuln>0)invuln=Math.max(0,invuln-dt);
+ speed=(165+(distance/finishDistance)*35+(level-1)*15)*(boost>0?1.6:1);
+ world+=speed*dt;distance+=speed*dt;
+ // Movimiento lateral controlable: el escenario sigue avanzando como runner.
+ if(moveInput.left)player.x-=MOVE_SPEED*dt;
+ if(moveInput.right)player.x+=MOVE_SPEED*dt;
+ player.x=clamp(player.x,24,Math.min(W-player.w-18,W*.58));
+ // La animación de carrera se mantiene activa mientras avanza la aventura.
+ player.anim+=dt*(moveInput.left||moveInput.right?1.25:1);
+ if(player.onGround===false||player.vy!==0){
+  player.vy+=1650*dt;player.y+=player.vy*dt;
+ }
+ if(player.y+player.h>=GROUND){player.y=GROUND-player.h;player.vy=0;player.onGround=true}
+ else player.onGround=false;
+ if(!Number.isFinite(player.y)||player.y>H+100){player.y=GROUND-player.h;player.vy=0;player.onGround=true}
+ player.frame=player.crouching&&player.onGround?8:(player.onGround?4+Math.floor(player.anim*12)%4:(player.vy<0?8:9));
+ obstacleTimer-=dt;if(obstacleTimer<=0){spawnObstacle();obstacleTimer=rand(Math.max(.52,.95-(level-1)*.12),Math.max(.85,1.55-(level-1)*.18))}
+ plantTimer-=dt;if(plantTimer<=0){spawnPlant();plantTimer=rand(Math.max(.85,1.25-(level-1)*.12),Math.max(1.35,2.0-(level-1)*.15))}
+ birdTimer-=dt;if(birdTimer<=0){spawnBird();birdTimer=rand(Math.max(2.1,3.5-(level-1)*.45),Math.max(3.2,5.2-(level-1)*.5))}
+ for(const o of obstacles)o.x-=speed*dt;
+ for(const p of pickups){p.x-=speed*dt;p.phase+=dt*4}
+ for(const b of birds){b.x-=(speed+70)*dt;b.phase+=dt*7}
+ obstacles=obstacles.filter(o=>o.x+o.w>-20);
+ pickups=pickups.filter(p=>p.x+p.r>-20);
+ birds=birds.filter(b=>b.x+b.w>-20);
+ const heroBox=player.crouching&&player.onGround
+  ?{x:player.x+18,y:GROUND-66,w:player.w-36,h:58}
+  :{x:player.x+18,y:player.y+14,w:player.w-36,h:player.h-20};
+ for(const o of obstacles){
+  if(overlap(heroBox,{x:o.x+5,y:o.y+4,w:o.w-10,h:o.h-4})){
+   if(shield>0){o.x=-100;burst(o.x,o.y,'#8af5ff',8)}
+   else {o.x=-100;loseLife(player.x+player.w/2,player.y+player.h/2);if(state!=='playing')return}
+  }
+ }
+ for(const b of birds){
+  const birdBox={x:b.x+15,y:b.y+15,w:b.w-30,h:b.h-25};
+  if(!b.hit&&overlap(heroBox,birdBox)){
+   b.hit=true;
+   if(shield>0){b.x=-200;burst(b.x,b.y,'#8af5ff',10)}
+   else {loseLife(player.x+player.w/2,player.y+player.h/2);if(state!=='playing')return}
+  }
+ }
+ for(const p of pickups){
+  const box={x:p.x-p.r,y:p.y-p.r,w:p.r*2,h:p.r*2};
+  if(!p.taken&&overlap(heroBox,box)){
+   p.taken=true;plants++;
+   if(p.type==='cat')lives=Math.min(5,lives+1);
+   if(p.type==='guarana')boost=5;
+   if(p.type==='ayahuasca')shield=5;
+   burst(p.x,p.y,p.type==='cat'?'#8eea69':p.type==='guarana'?'#ff5363':'#74f6ff',12);
+  }
+ }
+ pickups=pickups.filter(p=>!p.taken);
+ particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=300*dt;p.life-=dt});
+ particles=particles.filter(p=>p.life>0);
+ if(distance>=finishDistance){
+  distance=finishDistance-1;
+ }
+ setHud();
+}
+function drawBackground(){
+ ctx.clearRect(0,0,W,H);
+ const activeScene = level===2 ? sceneLevel2 : (level===3 ? sceneLevel3 : scene);
+ // La línea superior del césped se apoya en GROUND. Se conserva el zoom
+ // original del escenario y se desplaza hacia abajo para dejar menos espacio
+ // vacío bajo los pies del personaje.
+ const sourceGroundY = level===1 ? 400 : 560;
+ const baseScale = 400/sourceGroundY;
+ const tileW = activeScene.naturalWidth*baseScale;
+ const offset = world % (tileW*2);
+ const yOffset = GROUND-400;
+ const soilScreenHeight = 58;
+ ctx.fillStyle='#563727';
+ ctx.fillRect(0,0,W,H);
+ if(activeScene.complete && activeScene.naturalWidth){
+  const extraSource = Math.ceil(soilScreenHeight/baseScale);
+  const cropH = Math.min(activeScene.naturalHeight,sourceGroundY+extraSource);
+  const destH = cropH*baseScale;
+  for(let i=-1;i<=Math.ceil(W/tileW)+1;i++){
+   const x = i*tileW-offset;
+   if(Math.abs(i)%2===1){
+    ctx.save();
+    ctx.translate(x+tileW,0);
+    ctx.scale(-1,1);
+    ctx.drawImage(activeScene,0,0,activeScene.naturalWidth,cropH,
+                  0,yOffset,tileW,destH);
+    ctx.restore();
+   }else{
+    ctx.drawImage(activeScene,0,0,activeScene.naturalWidth,cropH,
+                  x,yOffset,tileW,destH);
+   }
+  }
+ }
+ // Solo una pequeña base de tierra debajo de la franja natural del spritesheet.
+ const soilBottom = Math.min(H,GROUND+soilScreenHeight);
+ ctx.fillStyle='#563727';
+ ctx.fillRect(0,soilBottom,W,H-soilBottom);
+}
+function drawHero(){
+ const frame=clamp(Math.floor(player.frame),0,15);
+ const sx=(frame%4)*280,sy=Math.floor(frame/4)*280;
+ if(hero.complete&&hero.naturalWidth>=1120){
+  if(player.crouching&&player.onGround){
+   ctx.drawImage(hero,0,2*280,280,280,player.x,GROUND-78,player.w,78);
+  }else{
+   ctx.drawImage(hero,sx,sy,280,280,player.x,player.y,player.w,player.h);
+  }
+ }else{
+  ctx.fillStyle='#60b7ff';ctx.fillRect(player.x+20,player.y+20,48,55);
+  ctx.fillStyle='#efbd91';ctx.fillRect(player.x+29,player.y+2,30,28);
+ }
+}
+function drawObstacle(o){
+ if(o.type==='rock'){
+  ctx.fillStyle='#615d58';ctx.fillRect(o.x+4,o.y+9,o.w-8,o.h-9);
+  ctx.fillStyle='#aaa99f';ctx.fillRect(o.x+10,o.y,o.w-20,12);
+  ctx.fillStyle='#46433e';ctx.fillRect(o.x+o.w-13,o.y+17,9,9);
+ }else{
+  ctx.fillStyle='#6a3e24';ctx.fillRect(o.x,o.y+5,o.w,o.h-5);
+  ctx.fillStyle='#b27a42';ctx.fillRect(o.x+3,o.y,o.w-6,8);
+ }
+}
+function drawBird(b){
+ const im=villainFrames[Math.floor(elapsed*10)%villainFrames.length];
+ if(!im||!im.complete||!im.naturalWidth)return;
+ ctx.save();ctx.translate(b.x+b.w,b.y+Math.sin(b.phase)*4);ctx.scale(-1,1);
+ ctx.drawImage(im,0,0,b.w,b.h);ctx.restore();
+}
+function drawPlant(p){
+ const bob=Math.sin(p.phase)*4;
+ ctx.save();ctx.translate(p.x,p.y+bob);
+ if(p.type==='cat'){
+  ctx.fillStyle='#68c64b';ctx.beginPath();ctx.ellipse(-5,3,8,13,-.6,0,Math.PI*2);ctx.ellipse(6,0,8,13,.6,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#e5ff9b';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(0,12);ctx.lineTo(0,-9);ctx.stroke();
+ }else if(p.type==='guarana'){
+  ctx.fillStyle='#f04454';ctx.beginPath();ctx.arc(0,0,12,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#ffb4b8';ctx.beginPath();ctx.arc(-4,-4,4,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#478d38';ctx.fillRect(-2,-16,5,6);
+ }else{
+  ctx.fillStyle='#61efff';ctx.beginPath();ctx.arc(0,0,13,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#e4ffff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,18,0,Math.PI*2);ctx.stroke();
+ }
+ ctx.restore();
+}
+function drawParticles(){
+ for(const p of particles){ctx.globalAlpha=Math.max(0,p.life/p.max);ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,4,4)}
+ ctx.globalAlpha=1;
+}
+function draw(){
+ drawBackground();
+ if(distance>finishDistance-700){
+  const gx=W-135;ctx.fillStyle='#f6d04d';ctx.fillRect(gx,GROUND-130,10,130);ctx.fillRect(gx+80,GROUND-130,10,130);ctx.fillRect(gx,GROUND-130,90,12);
+  ctx.fillStyle='#fff';ctx.fillRect(gx+12,GROUND-116,20,20);ctx.fillStyle='#e94b44';ctx.fillRect(gx+35,GROUND-116,20,20);
+ }
+ obstacles.forEach(drawObstacle);
+ birds.forEach(drawBird);
+ pickups.forEach(drawPlant);
+ drawHero();
+ drawParticles();
+}
+function loop(now){
+ if(state!=='playing')return;
+ if(!lastTime)lastTime=now;
+ const dt=Math.min(.033,Math.max(0,(now-lastTime)/1000));lastTime=now;
+ update(dt);draw();
+ if(state==='playing')requestAnimationFrame(loop);
+}
+function idleLoop(){if(state!=='playing'){draw();requestAnimationFrame(idleLoop)}}
+$('startBtn').addEventListener('click',e=>{e.preventDefault();start();});
+$('jumpBtn').addEventListener('pointerdown',e=>{e.preventDefault();jump()});
+$('crouchBtn').addEventListener('pointerdown',e=>{e.preventDefault();setCrouch(true);try{$('crouchBtn').setPointerCapture(e.pointerId)}catch(_){}});
+for(const ev of ['pointerup','pointercancel','lostpointercapture'])$('crouchBtn').addEventListener(ev,()=>setCrouch(false));
+function bindMoveButton(id,direction){
+ const el=$(id);
+ const down=e=>{e.preventDefault();if(state==='ready')start();moveInput[direction]=true;try{el.setPointerCapture(e.pointerId)}catch(_){}};
+ const up=e=>{e.preventDefault();moveInput[direction]=false};
+ el.addEventListener('pointerdown',down);
+ for(const ev of ['pointerup','pointercancel','lostpointercapture'])el.addEventListener(ev,up);
+}
+bindMoveButton('leftBtn','left');
+bindMoveButton('rightBtn','right');
+$('restartBtn').addEventListener('click',reset);
+function bindActionButton(id, actionDown, actionUp){
+ const el=$(id);
+ const down=e=>{e.preventDefault();if(state==='ready')start();actionDown();try{el.setPointerCapture(e.pointerId)}catch(_){}};
+ const up=e=>{e.preventDefault();if(actionUp)actionUp()};
+ el.addEventListener('pointerdown',down);
+ ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>el.addEventListener(ev,up));
+}
+bindActionButton('jumpBtn',()=>jump());
+bindActionButton('crouchBtn',()=>setCrouch(true),()=>setCrouch(false));
+const movementKeys={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right'};
+window.addEventListener('keydown',e=>{
+ // ENTER inicia la aventura, continúa al siguiente nivel o vuelve a jugar.
+ // Se ignoran repeticiones para evitar iniciar dos bucles de animación.
+ if(e.code==='Enter'){
+  e.preventDefault();
+  if(!e.repeat && state!=='playing') start();
+  return;
+ }
+ if(movementKeys[e.code]){
+  e.preventDefault();
+  moveInput[movementKeys[e.code]]=true;
+  if(state==='ready')start();
+ }
+ if(['Space','ArrowUp','KeyW'].includes(e.code)){
+  e.preventDefault();
+  if(!e.repeat)jump();
+ }
+ if(['ArrowDown','KeyS'].includes(e.code)){
+  e.preventDefault();
+  setCrouch(true);
+ }
+});
+window.addEventListener('keyup',e=>{
+ if(movementKeys[e.code]){e.preventDefault();moveInput[movementKeys[e.code]]=false}
+ if(['ArrowDown','KeyS'].includes(e.code))setCrouch(false)
+});
+window.addEventListener('blur',()=>{setCrouch(false);moveInput.left=false;moveInput.right=false});
+window.addEventListener('pointerdown',e=>{if(e.target===canvas&&state==='playing')jump()});
+hero.onload=()=>draw();scene.onload=()=>draw();
+reset();
+requestAnimationFrame(idleLoop);
+})();
+</script>
+</body>
+</html>

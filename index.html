@@ -1,1 +1,57 @@
-
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#4e653c">
+  <meta name="description" content="La Gran Aventura, un juego de plataformas inspirado en los paisajes de Iquitos.">
+  <title>La Gran Aventura | Juego de Iquitos</title>
+  <style>
+    :root{--sage:#829269;--blue:#016bc5;--green:#4e653c;--red:#e62532;--brown:#483b36;--cream:#f8f5ec;--ink:#282820}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}a{color:inherit}
+    .hero{min-height:690px;position:relative;overflow:hidden;display:grid;place-items:center;text-align:center;padding:55px 20px;background:linear-gradient(135deg,#829269e8,#4e653ce8),url("assets/nivel-1.jpg") center/cover}
+    .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#182a1628,#17271380)}.hero-inner{position:relative;z-index:1;max-width:980px;color:white}
+    .eyebrow,.section-kicker{font-size:.82rem;letter-spacing:.2em;font-weight:900;text-transform:uppercase}.eyebrow{color:#fff2ce}.section-kicker{color:var(--blue)}
+    .hero h1{font-size:clamp(3.2rem,9vw,7.5rem);line-height:.9;letter-spacing:-.06em;margin:18px 0;text-shadow:0 7px 0 var(--brown)}.hero p{max-width:720px;margin:20px auto;font-size:clamp(1.05rem,2.4vw,1.35rem);line-height:1.6;color:#fff9e9}
+    .hero-sprite{display:block;width:min(230px,45vw);height:180px;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(0 8px 0 #26341f88);margin:4px auto -5px}.ctas{display:flex;gap:13px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+    .button{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:16px 30px;text-decoration:none;font-size:1.05rem;font-weight:900;transition:.2s ease}.button:hover{transform:translateY(-3px);filter:brightness(1.06)}.button:focus-visible{outline:4px solid white;outline-offset:4px}
+    .play{background:var(--red);color:#fff;box-shadow:0 6px 0 #9c1721}.more{background:#fff;color:var(--brown);box-shadow:0 6px 0 #d0c8b8}.pills{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:30px}.pill{background:#ffffff25;border:1px solid #ffffff65;padding:8px 14px;border-radius:99px;font-weight:750;font-size:.92rem}
+    .content{padding:76px 22px}.container{max-width:1120px;margin:auto}h2{font-size:clamp(2rem,5vw,3.2rem);line-height:1.05;margin:10px 0 16px;color:var(--brown);letter-spacing:-.04em}.intro-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:36px;align-items:center}.intro-copy p{font-size:1.08rem;line-height:1.8;color:#5e5a50}
+    .sprite-panel{background:#e8eadc;border-radius:28px;padding:22px;display:grid;place-items:center;min-height:300px;border:2px solid #d6dcc9;overflow:hidden}.sprite-panel img{width:100%;max-height:310px;object-fit:contain;image-rendering:pixelated}
+    .levels{background:#e9eddf}.level-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:30px}.level-card{background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 8px 24px #483b3612;border:1px solid #e5e2d8}.level-card img{width:100%;height:190px;object-fit:cover;display:block}.level-copy{padding:21px}
+    .number{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--blue);color:white;font-weight:900}.level-copy h3{margin:13px 0 7px;color:var(--brown);font-size:1.25rem}.level-copy p{color:#69645d;line-height:1.65;margin:0}
+    .review{background:var(--brown);color:#fff;padding:65px 22px;text-align:center}.review h2{color:#fff}.review blockquote{max-width:850px;margin:22px auto 0;font-size:clamp(1.25rem,3vw,1.8rem);line-height:1.6;font-weight:650}.review small{display:block;margin-top:18px;color:#d6d2c9;letter-spacing:.08em}
+    .gallery{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin-top:28px}.gallery img{width:100%;height:230px;object-fit:cover;border-radius:20px;display:block}.gallery img:first-child{grid-row:span 2;height:100%;min-height:476px}
+    .bottom-cta{text-align:center;background:var(--sage);padding:64px 20px;color:white}.bottom-cta h2{color:white}.bottom-cta p{font-size:1.08rem;margin:0 0 25px}footer{background:#302923;color:#eae5d9;text-align:center;padding:22px;font-size:.9rem}
+    @media(max-width:760px){.intro-grid,.level-grid,.gallery{grid-template-columns:1fr}.gallery img,.gallery img:first-child{grid-row:auto;height:210px;min-height:0}.level-card img{height:210px}.hero{min-height:640px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.button{transition:none}}
+  </style>
+</head>
+<body>
+  <header class="hero" id="inicio">
+    <div class="hero-inner">
+      <div class="eyebrow">Una aventura pixel art por Iquitos · Perú</div>
+      <img class="hero-sprite" src="assets/jugador-portada.png" alt="Personaje principal de La Gran Aventura">
+      <h1>LA GRAN<br>AVENTURA</h1>
+      <p>¡Corre, salta y explora los paisajes de nuestra Amazonía! Acompaña a nuestro aventurero en un recorrido lleno de retos, plantas mágicas y escenarios inspirados en Iquitos.</p>
+      <div class="ctas"><a class="button play" href="juego.html">JUGAR AHORA</a><a class="button more" href="#historia">DESCUBRIR EL JUEGO</a></div>
+      <div class="pills"><span class="pill">3 niveles</span><span class="pill">10 plantas por nivel</span><span class="pill">3 vidas</span><span class="pill">Teclado y celular</span></div>
+    </div>
+  </header>
+  <main>
+    <section class="content" id="historia"><div class="container intro-grid">
+      <div class="intro-copy"><div class="section-kicker">Conoce la aventura</div><h2>Una carrera por los rincones de Iquitos</h2><p><strong>La Gran Aventura</strong> es un videojuego de plataformas tipo runner con estética pixel art. El jugador recorre escenarios inspirados en lugares emblemáticos de Iquitos, esquiva obstáculos, evita aves en movimiento y recoge plantas para avanzar.</p><p>Cada etapa propone un nuevo paisaje y aumenta el desafío. Tendrás que administrar tus tres vidas, completar el recorrido y reunir las plantas mágicas para convertirte en el campeón de esta aventura.</p></div>
+      <div class="sprite-panel"><img src="assets/jugador-sprites.png" alt="Animaciones del personaje principal"></div>
+    </div></section>
+    <section class="content levels"><div class="container"><div class="section-kicker">Tu recorrido</div><h2>Tres niveles, una gran aventura</h2><div class="level-grid">
+      <article class="level-card"><img src="assets/nivel-1.jpg" alt="Escenario urbano de Iquitos"><div class="level-copy"><span class="number">1</span><h3>Ribera de Iquitos</h3><p>Aprende a dominar los saltos, esquiva los primeros obstáculos y reúne las plantas mágicas para llegar a la meta.</p></div></article>
+      <article class="level-card"><img src="assets/nivel-2.jpg" alt="Río, casas amazónicas y puente"><div class="level-copy"><span class="number">2</span><h3>La ruta del Malecón</h3><p>La aventura continúa junto al río. Mantente atento, conserva tus vidas y completa la recolección.</p></div></article>
+      <article class="level-card"><img src="assets/nivel-3.jpg" alt="Parque Turístico Quistococha"><div class="level-copy"><span class="number">3</span><h3>Parque Turístico Quistococha</h3><p>Supera la etapa final, recoge las plantas mágicas y alcanza la meta para ganar.</p></div></article>
+    </div></div></section>
+    <section class="review"><div class="container"><div class="section-kicker" style="color:#9ed0ff">Reseña del juego</div><h2>Diversión, reflejos y orgullo amazónico</h2><blockquote>“La Gran Aventura convierte lugares reconocibles de Iquitos en un recorrido interactivo. Su estilo pixel art, sus escenarios coloridos y sus tres etapas hacen que cada avance sea un nuevo reto.”</blockquote><small>RESEÑA DESCRIPTIVA DEL VIDEOJUEGO</small></div></section>
+    <section class="content"><div class="container"><div class="section-kicker">Paisajes del juego</div><h2>La Amazonía como escenario</h2><div class="gallery"><img src="assets/nivel-3.jpg" alt="Parque Turístico Quistococha"><img src="assets/nivel-1.jpg" alt="Vista de Iquitos"><img src="assets/nivel-2.jpg" alt="Río amazónico y puente"></div></div></section>
+    <section class="bottom-cta"><div class="container"><h2>¿Listo para comenzar?</h2><p>Demuestra tus reflejos y completa los tres niveles de La Gran Aventura.</p><a class="button play" href="juego.html">EMPEZAR A JUGAR</a></div></section>
+  </main>
+  <footer>LA GRAN AVENTURA · IQUITOS, PERÚ</footer>
+</body>
+</html>
